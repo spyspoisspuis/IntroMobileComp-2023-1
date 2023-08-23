@@ -1,0 +1,38 @@
+<html lang="en">
+</html>
+<head>
+</head>
+<meta charset="UTF-8">
+<style>
+</style>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap">
+<script src="script.js"></script>
+
+<body id="body">
+   <header> Toggle Dark/Light Mode</header>
+   <p> Click the button to switch between dark/light mode</p>
+   <button id="toggle" onClick="SwitchMode()" style="width:10%">Toggle Dark Mode</button>
+
+   <div id="salaries" class="section">
+      <div id="salaries-header">
+         <p>รายได้ (บาท)</p>
+         <img src="add.png" alt="Image" width="30" height="30" onClick="AddSalariesInput()"/>
+         <img src="minus.png" alt="Image" width="30" height="30" onClick="RemoveSalariesInput()"/>
+      </div>
+      <div id="salaries-1" class="add-salaries-class">
+         <input class="typable-input" oninput="validateNumber(this,'salaries-1')" id="salaries-1-input" ></input>
+      </div>
+   </div>
+
+   <div id="summary" class="section">
+      <p>รายได้รวม (บาท)</p>
+      <input id="summation-salaries" type="text" class="untypable-input" disable> </input>
+       <p>อัตราภาษี (%)</p>
+      <input id="tax-rate" type="text" class="untypable-input" disable> </input> 
+       <p>ภาษีที่ต้องจ่าย (บาท)</p>
+      <input id="to-paid" type="text" class="untypable-input" disable> </input>  
+   </div>
+</body>
+
+</html>

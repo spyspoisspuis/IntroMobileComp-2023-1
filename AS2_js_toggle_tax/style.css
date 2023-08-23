@@ -1,0 +1,45 @@
+body {
+    display:flex;
+    flex-flow: column;
+    gap: 20px;
+}
+
+
+.section {
+    display: flex;
+    flex-flow: column;
+    gap: 20px;
+}
+
+#salaries-header {
+    display:flex;
+    flex-flow: row;
+    align-items: center;
+    gap: 20px;
+}
+
+img {
+    cursor:pointer;
+}
+
+.typable-input {
+    width: 30%;
+    height: 100%;
+}
+
+#summary {
+    width:50%;
+}
+
+.untypable-input {
+    width: 30%;
+}
+
+.add-salaries-class {
+    width: 50%;
+    display: flex;
+    flex-flow: row;
+    gap: 20px;
+    align-items: center;
+    height: 30px;
+}
