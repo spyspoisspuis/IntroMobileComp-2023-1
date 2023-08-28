@@ -119,7 +119,6 @@ function UpdateTaxRate(summation) {
 }
 
 function CalculateTaxToPaid(summation,taxRate) {
-    console.log("🚀 ~ file: script.js:122 ~ CalculateTaxToPaid ~ taxRate:", taxRate)
     var rate; 
     if (taxRate === "ได้รับการยกเว้น") {
         rate = 0; //* Such that paid will equal to 0
