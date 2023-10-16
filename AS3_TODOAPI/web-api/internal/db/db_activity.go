@@ -25,8 +25,8 @@ func GetActivityByID(activity *util.Activity, id string) error {
 	return nil
 }
 
-func UpdateActivity(activity util.Activity,id string) error {
-	if err := database.Where("id=?",id).Save(activity).Error; err != nil {
+func UpdateActivity(activity util.Activity) error {
+	if err := database.Where("id=?",activity.ID).Save(activity).Error; err != nil {
 		return err
 	}
 	return nil

@@ -48,13 +48,14 @@ func InsertActivity(c *gin.Context) {
 }
 
 func UpdateActivity(c *gin.Context) {
-	id := c.Params.ByName("id")
 	var inp util.Activity
 	if err := c.ShouldBind(&inp); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
 	}
-	err := db.UpdateActivity(inp, id)
+
+	err := db.UpdateActivity(inp)
 	if err != nil {
+
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -70,4 +71,4 @@ func DeleteActivity(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusOK)
-}	
+}
