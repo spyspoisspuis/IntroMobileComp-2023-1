@@ -16,7 +16,8 @@ func RouterEngine() *gin.Engine {
 	activities := r.Group("/activities")
 	{
 		activities.GET("", activity.GetActivities)
-		activities.GET("/:id", activity.GetActivityByID)
+		activities.GET("/id/:id", activity.GetActivityByID)
+		activities.GET("/user/:id", activity.GetActivityByID)
 		activities.POST("", activity.InsertActivity)
 		activities.PUT("", activity.UpdateActivity)
 		activities.DELETE("/:id", activity.DeleteActivity)

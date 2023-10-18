@@ -39,6 +39,20 @@ func GetActivityByID(c *gin.Context) {
 	c.JSON(http.StatusOK, activity)
 }
 
+func GetActivitiesByUser(c *gin.Context) {
+	id := c.Params.ByName("id")
+	activities, err := GetActivityByUserIDDB(db.GetDB(), id)
+	if errors.Is(gorm.ErrRecordNotFound, err) {
+		c.JSON(http.StatusOK, nil)
+		return
+	}
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, activities)
+}
+
 func InsertActivity(c *gin.Context) {
 	var inp models.Activity
 	if err := c.ShouldBind(&inp); err != nil {

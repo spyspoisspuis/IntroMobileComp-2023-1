@@ -29,6 +29,14 @@ func GetActivityByIDDB(db *gorm.DB,  id string) (*models.Activity,error) {
 	return activity,nil
 }
 
+func GetActivityByUserIDDB(db *gorm.DB, userID string) ([]*models.Activity,error) {
+	var activities []*models.Activity
+	if err := db.Where("user_id=?", userID).Find(&activities).Error; err != nil {
+		return nil,err
+	}
+	return activities,nil
+}
+
 func UpdateActivityDB(db *gorm.DB, activity *models.Activity) error {
 	return db.Where("id=?", activity.ID).Save(&activity).Error
 }
