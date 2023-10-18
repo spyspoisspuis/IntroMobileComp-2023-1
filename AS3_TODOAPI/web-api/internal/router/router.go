@@ -27,6 +27,7 @@ func RouterEngine() *gin.Engine {
 		user.GET("/:id", authentication.GetUserByID)
 		user.POST("", authentication.InsertUser)
 		user.DELETE("/:id", authentication.DeleteUser)
+		user.PUT("/reset-password",authentication.ResetPassword)
 	}
 
 	return r

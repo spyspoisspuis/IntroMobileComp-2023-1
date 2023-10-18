@@ -29,16 +29,17 @@ func GetUserByUsername(db *gorm.DB, username string) (*models.User, error) {
 	return user, nil
 }
 
-func InsertUserDB(db *gorm.DB, user *models.User) error {
+func InsertUserDB(db *gorm.DB, user *models.User) (int, error) {
 	if err := db.Create(&user).Error; err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return user.ID, nil
 }
 
 func DeleteUserDB(db *gorm.DB, id string) error {
-	if err := db.Where("id=?", id).Delete(&models.User{}).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Where("id=?", id).Delete(&models.User{}).Error
+}
+
+func UpdateUserDB(db *gorm.DB, user *models.User) error {
+	return db.Where("id=?", user.ID).Save(&user).Error
 }

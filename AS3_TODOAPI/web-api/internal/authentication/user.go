@@ -25,7 +25,7 @@ func Authentication(c *gin.Context) {
 		return
 	}
 
-	user,err := GetUserByUsername(db.GetDB(),inp.Username)
+	user, err := GetUserByUsername(db.GetDB(), inp.Username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -63,12 +63,12 @@ func InsertUser(c *gin.Context) {
 		return
 	}
 
-	err = insertUser(inp.Username, inp.Password)
+	id, err := insertUser(inp.Username, inp.Password)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, gin.H{"ID": id})
 }
 
 func DeleteUser(c *gin.Context) {
@@ -82,8 +82,8 @@ func DeleteUser(c *gin.Context) {
 }
 
 func GetUsersList(c *gin.Context) {
-	
-	users,err := GetUserList(db.GetDB())
+
+	users, err := GetUserList(db.GetDB())
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -99,11 +99,35 @@ func GetUserByID(c *gin.Context) {
 		return
 	}
 
-	user,err := GetUserByIDDB(db.GetDB(), id)
+	user, err := GetUserByIDDB(db.GetDB(), id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": user})
 
+}
+
+func ResetPassword(c *gin.Context) {
+	var inp models.User
+	if err := c.ShouldBind(&inp); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+		return
+	}
+	if inp.ID == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+		return
+	}
+	user, err := GenerateNewUserModels(inp.ID, inp.Username, inp.Password)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = UpdateUserDB(db.GetDB(), user)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusOK)
 }
