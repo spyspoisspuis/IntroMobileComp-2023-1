@@ -2,15 +2,16 @@ package authentication
 
 import (
 	"net/http"
+	"strconv"
 	"web-api/internal/db"
-	"web-api/internal/util"
+	"web-api/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func Authentication(c *gin.Context) {
-	var inp util.User
+	var inp models.User
 	if err := c.ShouldBind(&inp); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
 	}
@@ -24,8 +25,7 @@ func Authentication(c *gin.Context) {
 		return
 	}
 
-	var user util.User
-	err = db.GetUserByUsername(&user, inp.Username)
+	user,err := GetUserByUsername(db.GetDB(),inp.Username)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -33,7 +33,6 @@ func Authentication(c *gin.Context) {
 
 	salt := user.Salt
 	saltedpassword := inp.Password + salt
-
 
 	if er := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(saltedpassword)); er != nil {
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "username or password incorrect"})
@@ -44,12 +43,12 @@ func Authentication(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{"token":token})
+	c.JSON(http.StatusOK, gin.H{"token": token})
 
 }
 
 func InsertUser(c *gin.Context) {
-	var inp util.User
+	var inp models.User
 	if err := c.ShouldBind(&inp); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
 	}
@@ -74,8 +73,7 @@ func InsertUser(c *gin.Context) {
 
 func DeleteUser(c *gin.Context) {
 	id := c.Params.ByName("id")
-	var user util.User
-	err := db.DeleteUser(user, id)
+	err := DeleteUserDB(db.GetDB(), id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -84,8 +82,8 @@ func DeleteUser(c *gin.Context) {
 }
 
 func GetUsersList(c *gin.Context) {
-	var users []util.User
-	err := db.GetUserList(&users)
+	
+	users,err := GetUserList(db.GetDB())
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -93,10 +91,15 @@ func GetUsersList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": users})
 }
 
-func GetUserByUsername(c *gin.Context) {
-	username := c.Params.ByName("username")
-	var user util.User
-	err := db.GetUserByUsername(&user, username)
+func GetUserByID(c *gin.Context) {
+	sid := c.Params.ByName("id")
+	id, err := strconv.Atoi(sid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+		return
+	}
+
+	user,err := GetUserByIDDB(db.GetDB(), id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

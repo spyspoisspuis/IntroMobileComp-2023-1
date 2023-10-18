@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"web-api/internal/db"
-	"web-api/internal/util"
+	"web-api/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,35 +15,35 @@ func insertUser(username, password string) error {
 	if err != nil {
 		return err
 	}
-	hashedPassword,err := GenerateHashedPassword(password,salt)
+	hashedPassword, err := GenerateHashedPassword(password, salt)
 	if err != nil {
 		return err
 	}
 	// Insert the user record into the database
 	// Replace this part with your database insert logic
-	newUser := util.User{
+	newUser := &models.User{
 		Username: username,
 		Password: hashedPassword,
 		Salt:     salt,
 	}
 
-	err = db.InsertUser(newUser)
-	if err != nil { 
+	err = InsertUserDB(db.GetDB(),newUser)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GenerateHashedPassword(password,salt string) (string,error) {
+func GenerateHashedPassword(password, salt string) (string, error) {
 	// Combine password and salt
 	saltedPassword := password + salt
 
 	// Hash the salted password using bcrypt
 	hashedPassword, err := HashPassword(saltedPassword)
 	if err != nil {
-		return "",err
+		return "", err
 	}
-	return hashedPassword,nil
+	return hashedPassword, nil
 }
 
 // GenerateSalt generates a random salt

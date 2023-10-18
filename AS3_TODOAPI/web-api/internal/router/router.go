@@ -13,20 +13,20 @@ func RouterEngine() *gin.Engine {
 	r.POST("/user/login", authentication.Authentication)
 
 	r.Use(authentication.AuthMiddleware())
-	activities := r.Group("/activity")
+	activities := r.Group("/activities")
 	{
-		activities.GET("/get", activity.GetActivities)
-		activities.GET("/get/:id", activity.GetActivityByID)
-		activities.POST("/insert", activity.InsertActivity)
-		activities.PUT("/update/:id", activity.UpdateActivity)
-		activities.DELETE("/delete/:id", activity.DeleteActivity)
+		activities.GET("", activity.GetActivities)
+		activities.GET("/:id", activity.GetActivityByID)
+		activities.POST("", activity.InsertActivity)
+		activities.PUT("", activity.UpdateActivity)
+		activities.DELETE("/:id", activity.DeleteActivity)
 	}
-	user := r.Group("/user")
+	user := r.Group("/users")
 	{
-		user.GET("/get", authentication.GetUsersList)
-		user.GET("/get/:username", authentication.GetUserByUsername)
-		user.POST("/insert", authentication.InsertUser)
-		user.DELETE("/delete/:id", authentication.DeleteUser)
+		user.GET("", authentication.GetUsersList)
+		user.GET("/:id", authentication.GetUserByID)
+		user.POST("", authentication.InsertUser)
+		user.DELETE("/:id", authentication.DeleteUser)
 	}
 
 	return r
