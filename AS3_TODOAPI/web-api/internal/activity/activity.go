@@ -3,6 +3,8 @@ package activity
 import (
 	"errors"
 	"net/http"
+	"strconv"
+	"web-api/internal/authentication"
 	"web-api/internal/db"
 	"web-api/internal/models"
 
@@ -26,7 +28,12 @@ func GetActivities(c *gin.Context) {
 }
 
 func GetActivityByID(c *gin.Context) {
-	id := c.Params.ByName("id")
+	sid := c.Params.ByName("id")
+	id, err := strconv.Atoi(sid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+		return
+	}
 	activity, err := GetActivityByIDDB(db.GetDB(), id)
 	if errors.Is(gorm.ErrRecordNotFound, err) {
 		c.JSON(http.StatusOK, nil)
@@ -36,12 +43,32 @@ func GetActivityByID(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+
+	//* Check is user is owner
+	tokenString := c.Request.Header.Get("Authorization")
+	userID, err := authentication.GetUserIDFromToken(tokenString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if userID != activity.UserID {
+		c.JSON(http.StatusOK, nil)
+		return
+	}
+
 	c.JSON(http.StatusOK, activity)
 }
 
 func GetActivitiesByUser(c *gin.Context) {
-	id := c.Params.ByName("id")
-	activities, err := GetActivityByUserIDDB(db.GetDB(), id)
+	//* Get userID from token
+	tokenString := c.Request.Header.Get("Authorization")
+	userID, err := authentication.GetUserIDFromToken(tokenString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	activities, err := GetActivityByUserIDDB(db.GetDB(), userID)
 	if errors.Is(gorm.ErrRecordNotFound, err) {
 		c.JSON(http.StatusOK, nil)
 		return
@@ -60,6 +87,16 @@ func InsertActivity(c *gin.Context) {
 		return
 	}
 
+	//* Get userID from token
+	tokenString := c.Request.Header.Get("Authorization")
+	userID, err := authentication.GetUserIDFromToken(tokenString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	inp.UserID = userID
+
+	//* insert
 	id, err := InsertActivityDB(db.GetDB(), &inp)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -74,9 +111,16 @@ func UpdateActivity(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	//* Get userID from token
+	tokenString := c.Request.Header.Get("Authorization")
+	userID, err := authentication.GetUserIDFromToken(tokenString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	inp.UserID = userID
 
 	activities, err := GetActivitiesList(db.GetDB())
-
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -97,8 +141,13 @@ func UpdateActivity(c *gin.Context) {
 }
 
 func DeleteActivity(c *gin.Context) {
-	id := c.Params.ByName("id")
-	err := DeleteActivityDB(db.GetDB(), id)
+	sid := c.Params.ByName("id")
+	id, err := strconv.Atoi(sid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+		return
+	}
+	err = DeleteActivityDB(db.GetDB(), id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

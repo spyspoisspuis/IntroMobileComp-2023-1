@@ -11,13 +11,15 @@ func RouterEngine() *gin.Engine {
 	r := gin.Default()
 	r.Use(CORS())
 	r.POST("/user/login", authentication.Authentication)
+	r.PUT("/reset-password", authentication.ResetPassword)
+	r.POST("/user", authentication.InsertUser)
 
 	r.Use(authentication.AuthMiddleware())
 	activities := r.Group("/activities")
 	{
 		activities.GET("", activity.GetActivities)
 		activities.GET("/id/:id", activity.GetActivityByID)
-		activities.GET("/user/:id", activity.GetActivityByID)
+		activities.GET("/user", activity.GetActivitiesByUser)
 		activities.POST("", activity.InsertActivity)
 		activities.PUT("", activity.UpdateActivity)
 		activities.DELETE("/:id", activity.DeleteActivity)
@@ -26,9 +28,7 @@ func RouterEngine() *gin.Engine {
 	{
 		user.GET("", authentication.GetUsersList)
 		user.GET("/:id", authentication.GetUserByID)
-		user.POST("", authentication.InsertUser)
 		user.DELETE("/:id", authentication.DeleteUser)
-		user.PUT("/reset-password",authentication.ResetPassword)
 	}
 
 	return r

@@ -19,3 +19,4 @@ func ConnectDB() {
 func GetDB() *gorm.DB {
 	return database
 }
+

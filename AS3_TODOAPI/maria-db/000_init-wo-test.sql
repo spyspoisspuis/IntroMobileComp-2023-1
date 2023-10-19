@@ -8,6 +8,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE `todo` (
   `id` int(10) AUTO_INCREMENT NOT NULL ,
+  `userID` int(10) NOT NULL,
   `name` varchar(50) NOT NULL,
   `when` datetime,
   PRIMARY KEY(`id`)

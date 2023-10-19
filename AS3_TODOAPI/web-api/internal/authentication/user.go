@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"web-api/internal/db"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func Authentication(c *gin.Context) {
@@ -21,7 +23,7 @@ func Authentication(c *gin.Context) {
 		return
 	}
 	if !isUserNameExists {
-		c.JSON(http.StatusNotFound, gin.H{"message1": "username or password incorrect"})
+		c.JSON(http.StatusOK, gin.H{"result": false})
 		return
 	}
 
@@ -35,7 +37,7 @@ func Authentication(c *gin.Context) {
 	saltedpassword := inp.Password + salt
 
 	if er := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(saltedpassword)); er != nil {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "username or password incorrect"})
+		c.JSON(http.StatusOK, gin.H{"result": false})
 		return
 	}
 	token, err := GenerateJWTToken(user.Username)
@@ -43,7 +45,7 @@ func Authentication(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"result":true,"token": token})
 
 }
 
@@ -100,11 +102,15 @@ func GetUserByID(c *gin.Context) {
 	}
 
 	user, err := GetUserByIDDB(db.GetDB(), id)
+	if errors.Is(gorm.ErrRecordNotFound, err) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+		return
+	}
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": user})
+	c.JSON(http.StatusOK, gin.H{"list": user})
 
 }
 
@@ -114,11 +120,15 @@ func ResetPassword(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
 		return
 	}
-	if inp.ID == 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "ErrBadRequest"})
+
+	//* Get user id
+	users, err := GetUserByUsername(db.GetDB(), inp.Username)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"result": false})
 		return
 	}
-	user, err := GenerateNewUserModels(inp.ID, inp.Username, inp.Password)
+
+	user, err := GenerateNewUserModels(users.ID, inp.Username, inp.Password)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -129,5 +139,12 @@ func ResetPassword(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusOK)
+	
+	token, err := GenerateJWTToken(user.Username)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result":true,"token": token})
+
 }

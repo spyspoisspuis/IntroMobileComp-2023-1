@@ -21,7 +21,7 @@ func GetActivitiesList(db *gorm.DB) ([]*models.Activity,error) {
 	return activities,nil
 }
 
-func GetActivityByIDDB(db *gorm.DB,  id string) (*models.Activity,error) {
+func GetActivityByIDDB(db *gorm.DB,  id int) (*models.Activity,error) {
 	var activity *models.Activity
 	if err := db.Where("id=?", id).First(&activity).Error; err != nil {
 		return nil,err
@@ -29,9 +29,9 @@ func GetActivityByIDDB(db *gorm.DB,  id string) (*models.Activity,error) {
 	return activity,nil
 }
 
-func GetActivityByUserIDDB(db *gorm.DB, userID string) ([]*models.Activity,error) {
+func GetActivityByUserIDDB(db *gorm.DB, userID int) ([]*models.Activity,error) {
 	var activities []*models.Activity
-	if err := db.Where("user_id=?", userID).Find(&activities).Error; err != nil {
+	if err := db.Where("userID=?", userID).Find(&activities).Error; err != nil {
 		return nil,err
 	}
 	return activities,nil
@@ -41,6 +41,6 @@ func UpdateActivityDB(db *gorm.DB, activity *models.Activity) error {
 	return db.Where("id=?", activity.ID).Save(&activity).Error
 }
 
-func DeleteActivityDB(db *gorm.DB, id string) error {
+func DeleteActivityDB(db *gorm.DB, id int) error {
 	return db.Where("id=?", id).Delete(&models.Activity{}).Error
 }
