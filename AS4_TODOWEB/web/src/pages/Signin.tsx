@@ -17,8 +17,8 @@ function Signin() {
       .then((res) => {
         if (res.data.result == false) {
           addToast({
-            description: "username of password incorrect",
-            status: "error",
+            description: "username or password incorrect",
+            status: "warning",
           });
         } else {
           addToast({ description: "login success", status: "success" });

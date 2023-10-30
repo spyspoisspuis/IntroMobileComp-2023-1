@@ -28,13 +28,20 @@ function Main() {
       navigate("/signin");
       return
     }
+    console.log(token)
     axiosInstance
       .get("http://localhost:8100/activities/user")
       .then((res) => {
         SetData(res.data);
       })
-      .catch(() => {
-        addToast({ description: "error fetching data", status: "error" });
+      .catch((error) => {
+        if (error.response.status && error.response.status == 401) {
+          addToast({ description: "redirect to login", status: "warning" });
+          navigate("/signin");
+        }else {
+          addToast({ description: "error fetching data", status: "error" });
+        }
+        
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
