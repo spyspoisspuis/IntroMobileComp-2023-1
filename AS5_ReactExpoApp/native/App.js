@@ -5,7 +5,6 @@ import { useFonts } from "expo-font";
 import { Main, SignIn, Credit, SignOut, Wrapper } from "./screens";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
-// import { Ionicons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons"; // Use MaterialCommunityIcons instead of MaterialIcons
 
 SplashScreen.preventAutoHideAsync();
 const Drawer = createDrawerNavigator();
@@ -24,8 +23,6 @@ export default function App() {
   if (!fontsLoaded && !fontError) {
     return null;
   }
-
-
   
   return (
     <NavigationContainer onLayout={onLayoutRootView}>
