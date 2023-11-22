@@ -9,3 +9,4 @@ Consits of
 5. Mobile App : Using react native + expo + native base
 6. Calculating Fourier transform using python
 
+Navigate to each folder for more informations 
