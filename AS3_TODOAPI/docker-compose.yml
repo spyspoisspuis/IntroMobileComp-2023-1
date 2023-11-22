@@ -2,22 +2,25 @@ version: '3'
 
 services:
   web-api:
-    image: golang:1.19
-    container_name: todoAPI-web-service
+    container_name: todoapi-web-service
+    image: todoapi-web-image
+    build: 
+      context: ./web-api
     environment:
       CONNECTION_DBURL: ${DB_USER}:${DB_PASSWORD}@tcp(db:3306)/${DB_NAME}?parseTime=true
+      CORS_TARGET: ${WEB_CORS_TARGET}
     working_dir: /app/todoAPI
-    volumes: 
-      - ./web-api:/app/todoAPI
+
     ports:
       - 8100:8100
     depends_on:
       - db
     networks:
       - backbone
-    command: sh -c "go mod vendor && go run main.go"
+
   db:
-    container_name: todoAPI-database-service
+    container_name: todoapi-database-service
+    image: todoapi-database-image
     build:
       context: ./maria-db
     environment:

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -8,8 +9,10 @@ import (
 var database *gorm.DB
 
 func ConnectDB() {
-	//TODO : change to .env routing when running on docker 
-	db, err := gorm.Open(mysql.Open("root:admin@tcp(localhost:3406)/ToDo?parseTime=True"), &gorm.Config{})
+	dbUrl := viper.GetString("connection.dbUrl")
+	// db, err := gorm.Open(mysql.Open("root:admin@tcp(localhost:3406)/ToDo?parseTime=True"), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dbUrl), &gorm.Config{})
+
 	if err != nil {
 		panic("failed to connect to database")
 	}
@@ -19,4 +22,3 @@ func ConnectDB() {
 func GetDB() *gorm.DB {
 	return database
 }
-

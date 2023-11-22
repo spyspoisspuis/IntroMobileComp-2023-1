@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"web-api/internal/db"
 	"web-api/internal/router"
+	"web-api/internal/util"
+
 )
 
 func main() {
 	fmt.Println("Service Available-------------")
-	// util.InitViper()
+	util.InitViper()
 	db.ConnectDB()
 
 	// defer db.DisconnectDB()
